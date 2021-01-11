@@ -10,14 +10,14 @@ with open("README.md", "r") as fh:
 
 # This call to setup() does all the work
 setuptools.setup(
-    name="hexalattice-alexkaz",
-    version="1.0.0",
+    name="hexalattice-akorevaar",
+    version="1.0.1",
     description="Compute and plot hexagonal grids",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/alexkaz2/hexalattice/wiki",
-    author="Alex Kazakov",
-    author_email="alex.kazakov@mail.huji.ac.il",
+    url="https://github.com/akorevaar/hexalattice",
+    author="Agnetha Korevaar",
+    author_email="-",
     license="MIT",
     classifiers=[
         "License :: OSI Approved :: MIT License",
