@@ -7,6 +7,9 @@ The module computes and returns the center point for each fo the tiles in the la
   <img width="450" src="https://github.com/alexkaz2/hexalattice/blob/master/example_hexagonal_lattices/lattice6.png">
 </p>
 
+Original source: https://github.com/alexkaz2/hexalattice
+
+Modified to allow plotting of lattices with different coloured hexagons. See multicolor example in hexalattice.py
 
 
 ## Installation

@@ -27,7 +27,8 @@ def create_hex_grid(nx: int = 4,
                     do_plot: bool = False,
                     rotate_deg: float = 0.,
                     keep_x_sym: bool = True,
-                    h_ax: plt.Axes = None) -> (np.ndarray, plt.Axes):
+                    h_ax: plt.Axes = None,
+                    multicolor: List = None) -> (np.ndarray, plt.Axes):
     """
     Creates and prints hexagonal lattices.
     :param nx: Number of horizontal hexagons in rectangular grid, [nx * ny]
@@ -54,7 +55,7 @@ def create_hex_grid(nx: int = 4,
     coord_x, coord_y = make_grid(nx, ny, min_diam, n, crop_circ, rotate_deg, align_to_origin)
 
     if do_plot:
-        h_ax = plot_single_lattice(coord_x, coord_y, face_color, edge_color, min_diam, plotting_gap, rotate_deg, h_ax)
+        h_ax = plot_single_lattice(coord_x, coord_y, face_color, edge_color, min_diam, plotting_gap, rotate_deg, h_ax, multicolor=multicolor)
 
     return np.hstack([coord_x, coord_y]), h_ax
 
@@ -118,7 +119,7 @@ def check_inputs(nx, ny, min_diam, n, align_to_origin, face_color, edge_color, p
     return args_are_valid
 
 
-def plot_single_lattice(coord_x, coord_y, face_color, edge_color, min_diam, plotting_gap, rotate_deg, h_ax=None):
+def plot_single_lattice(coord_x, coord_y, face_color, edge_color, min_diam, plotting_gap, rotate_deg, h_ax=None, multicolor=None):
     """
     Adds a single lattive to the axes canvas. Multiple calls can be made to overlay few lattices.
     :return:
@@ -132,14 +133,19 @@ def plot_single_lattice(coord_x, coord_y, face_color, edge_color, min_diam, plot
         h_fig = plt.figure(figsize=(5, 5))
         h_ax = h_fig.add_axes([0.05, 0.05, 0.9, 0.9])
 
-    patches = []
-    for curr_x, curr_y in zip(coord_x, coord_y):
+    # TODO this in-efficient, could rewrite it in a better way
+    if multicolor is None:
+        multicolor = []
+        for i in range(len(coord_x)):
+            multicolor.append(face_color)
+
+    for curr_x, curr_y, this_color in zip(coord_x, coord_y, multicolor):
         polygon = mpatches.RegularPolygon((curr_x, curr_y), numVertices=6,
                                           radius=min_diam / np.sqrt(3) * (1 - plotting_gap),
                                           orientation=np.deg2rad(-rotate_deg))
-        patches.append(polygon)
-    collection = PatchCollection(patches, edgecolor=edge_color, facecolor=face_color)
-    h_ax.add_collection(collection)
+        # It seems we have one face_color per collection, so individually collect each polygon
+        collection = PatchCollection([polygon], edgecolor=edge_color, facecolor=this_color)
+        h_ax.add_collection(collection)
 
     h_ax.set_aspect('equal')
     h_ax.axis([coord_x.min() - 2 * min_diam, coord_x.max() + 2 * min_diam, coord_y.min() - 2 * min_diam,
@@ -262,6 +268,24 @@ def main():
                     edge_color=[0.9, 0.9, 0.9],
                     do_plot=True,
                     h_ax=h_ax)
+
+    # multicolor example
+    # multicolor is a flat list of colors, which is just indexed by scanning across the hex grid (bottom row first then next row up and so on)
+    h = 3
+    w = 4
+    n = h * w
+    multicolor = []
+    for i in range(n): # go from red to blue
+        multicolor.append([1 - i / n, 0.0, i / n, 1.0])
+
+    create_hex_grid(nx=w,
+                    ny=h,
+                    min_diam=1,
+                    plotting_gap=0.3,
+                    face_color=face_c,
+                    do_plot=True,
+                    multicolor=multicolor)
+
     plt.show(block=True)
 
 
